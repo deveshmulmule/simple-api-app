@@ -1,0 +1,36 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials with ada
+        run: |
+          pip install ada-cli
+          ada credentials update --account=549725144537 --provider=conduit --role=IibsAdminAccess-DO-NOT-DELETE --once
+          eval $(ada credentials print --account=549725144537 --provider=conduit --role=IibsAdminAccess-DO-NOT-DELETE --format=sh)
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
+      
+      - name: Setup SAM
+        uses: aws-actions/setup-sam@v2
+      
+      - name: SAM Build
+        run: sam build
+      
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --stack-name simple-api-stack \
+            --region us-west-2 \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
