@@ -4,6 +4,7 @@
 ✅ **Successfully deployed via GitHub Actions**
 
 Workflow URL: https://github.com/deveshmulmule/simple-api-app/actions
+Environment: **production** 🚀
 
 ## API Endpoint
 https://qqp6p02r4h.execute-api.us-west-2.amazonaws.com/Prod/
